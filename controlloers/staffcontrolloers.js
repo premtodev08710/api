@@ -24,6 +24,7 @@ exports.show = async (req, res, next) => {
     });
   }
 };
+
 exports.destroy = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -41,6 +42,7 @@ exports.destroy = async (req, res, next) => {
     });
   }
 };
+
 exports.insert = async (req, res, next) => {
   const { name, salary } = req.body;
 
