@@ -70,7 +70,7 @@ exports.update = async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid ID or data' });
     }
 
-    const result = await Product.updateOne({ id: id }, { $set: updateData });
+    const result = await Product.updateOne({ _id: id }, { $set: updateData });
 
     if (result.nModified === 0) {
       return res.status(404).json({ message: 'Product not found to update' });
