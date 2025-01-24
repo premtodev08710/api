@@ -46,9 +46,9 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['กำลังดำเนินการ', 'จัดส่งสำเร็จ', 'รอการชำระเงิน', 'ชำระเงินแล้ว'],
+    enum: ['กำลังดำเนินการ', 'จัดส่งสำเร็จ', 'รอการชำระเงิน'],
     default: 'รอการชำระเงิน'
-},
+  },
   order_items: [orderItemSchema] // Embedded Document
 });
 
