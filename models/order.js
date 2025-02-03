@@ -26,6 +26,11 @@ const orderItemSchema = new mongoose.Schema({
 
 // Schema สำหรับ Order
 const orderSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId, // อ้างอิงถึง User
+    ref: 'User', // ชื่อ Model "User"
+    required: true
+  },
   customer_name: {
     type: String,
     required: true,
