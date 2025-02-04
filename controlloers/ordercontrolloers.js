@@ -8,16 +8,18 @@ exports.index = async (req, res, next) => {
     const orders = await Order.find()
       .populate('customer_id', 'name address'); // ดึงข้อมูลผู้ใช้
 
-    if (!orders.length) {
+    console.log('Fetched orders:', orders); // ตรวจสอบข้อมูลที่ดึงมา
+
+    if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'No orders found' });
     }
 
     // แปลงผลลัพธ์ให้ตรงกับ JSON ที่ต้องการ
     const formattedOrders = orders.map(order => ({
       _id: order._id,
-      customer_id: order.customer_id._id,
-      customer_name: order.customer_id.name,
-      customer_address: order.customer_id.address,
+      customer_id: order.customer_id?._id || null,
+      customer_name: order.customer_id?.name || 'Unknown',
+      customer_address: order.customer_id?.address || {},
       total_price: order.total_price,
       status: order.status,
       order_items: order.order_items.map(item => ({
@@ -31,10 +33,12 @@ exports.index = async (req, res, next) => {
       __v: order.__v
     }));
 
+    console.log('Formatted orders:', formattedOrders); // ตรวจสอบรูปแบบ JSON ที่ส่งกลับ
+
     res.status(200).json({ data: formattedOrders });
   } catch (error) {
     console.error('Error in index function:', error);
-    res.status(500).json({ error: 'An internal server error occurred' });
+    res.status(500).json({ error: error.message }); // ส่งข้อความข้อผิดพลาดที่ชัดเจนขึ้น
   }
 };
 
