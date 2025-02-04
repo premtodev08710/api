@@ -26,7 +26,7 @@ const orderItemSchema = new mongoose.Schema({
 
 // Schema สำหรับ Order
 const orderSchema = new mongoose.Schema({
-  user: {
+  customer_id: {
     type: mongoose.Schema.Types.ObjectId, // อ้างอิงถึง User
     ref: 'User', // ชื่อ Model "User"
     required: true
@@ -37,8 +37,10 @@ const orderSchema = new mongoose.Schema({
     maxlength: 100
   },
   customer_address: {
-    type: String,
-    required: true
+    street: { type: String, required: true, maxlength: 255 },
+    suite: { type: String, maxlength: 50 },
+    city: { type: String, required: true, maxlength: 100 },
+    zipcode: { type: String, required: true, maxlength: 20 }
   },
   order_date: {
     type: Date,
@@ -55,6 +57,24 @@ const orderSchema = new mongoose.Schema({
     default: 'รอการชำระเงิน'
   },
   order_items: [orderItemSchema] // Embedded Document
+});
+
+// ใช้ pre-hook เพื่อดึงข้อมูลที่อยู่ของผู้ใช้ก่อนบันทึกคำสั่งซื้อ
+orderSchema.pre('save', async function (next) {
+  if (!this.customer_address && this.customer_id) {
+    try {
+      const User = mongoose.model('User');
+      const user = await User.findById(this.customer_id).select('name address');
+
+      if (user) {
+        this.customer_name = user.name;
+        this.customer_address = user.address;
+      }
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+    }
+  }
+  next();
 });
 
 module.exports = mongoose.model('Order', orderSchema);
