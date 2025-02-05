@@ -1,6 +1,7 @@
 const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user'); // Import User Model
+const mongoose = require('mongoose');
 
 // แสดงรายการคำสั่งซื้อทั้งหมด
 exports.index = async (req, res, next) => {
@@ -45,40 +46,24 @@ exports.index = async (req, res, next) => {
 // แสดงคำสั่งซื้อเฉพาะ ID
 exports.show = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const order = await Order.findById(id)
-      .populate('customer_id', 'name address')
-      .populate('order_items.product_id', 'title');
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid order ID format' });
+    }
+
+    const order = await Order.findById(req.params.id)
+      .populate('customer_id', 'name address');
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // แปลงข้อมูลให้อยู่ในรูปแบบ JSON ที่ต้องการ
-    const formattedOrder = {
-      _id: order._id,
-      customer_id: order.customer_id._id,
-      customer_name: order.customer_id.name,
-      customer_address: order.customer_id.address,
-      total_price: order.total_price,
-      status: order.status,
-      order_items: order.order_items.map(item => ({
-        product_id: item.product_id,
-        product_title: item.product_title,
-        quantity: item.quantity,
-        price: item.price,
-        _id: item._id
-      })),
-      order_date: order.order_date,
-      __v: order.__v
-    };
-
-    res.status(200).json({ data: formattedOrder });
+    res.status(200).json({ data: order });
   } catch (error) {
     console.error('Error in show function:', error);
-    res.status(500).json({ error: 'An internal server error occurred' });
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 // สร้างคำสั่งซื้อใหม่
 exports.create = async (req, res, next) => {
