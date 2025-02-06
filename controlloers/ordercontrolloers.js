@@ -64,6 +64,29 @@ exports.show = async (req, res, next) => {
   }
 };
 
+// แสดงรายการคำสั่งซื้อที่มี customer_id ตรงกัน
+// ตรวจสอบการดึง customer_id จาก path parameter
+exports.customer = async (req, res, next) => {
+  try {
+    const customerId = req.params.id;  // ดึง customer_id จาก path parameter
+
+    if (!customerId) {
+      return res.status(400).json({ message: 'Customer ID is required' });
+    }
+
+    const orders = await Order.find({ customer_id: customerId })
+      .populate('customer_id', 'name address');
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for the given customer ID' });
+    }
+
+    res.status(200).json({ data: orders });
+  } catch (error) {
+    console.error('Error in index function:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // สร้างคำสั่งซื้อใหม่
 exports.create = async (req, res, next) => {
