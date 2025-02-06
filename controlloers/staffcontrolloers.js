@@ -13,7 +13,7 @@ exports.show = async (req, res, next) => {
     // const staff = await Staff.findOne({ _id: req.params.id });
     const staff = await Staff.findById(id);
     if (!staff) {
-      throw new Error("ไม่พบข้อทูลพนักงาน");
+      throw new Error("ไม่พบข้อมูลพนักงาน");
     }
     res.status(200).json({
       data: staff,
@@ -52,6 +52,6 @@ exports.insert = async (req, res, next) => {
   });
   await staff.save();
   res.status(201).json({
-    Message: "เพ่ิมเสร็จเรียบร้อย",
+    Message: "เพิ่มเสร็จเรียบร้อย",
   });
 };
