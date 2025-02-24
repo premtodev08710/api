@@ -95,7 +95,7 @@ exports.createUser = async (req, res) => {
   } catch (error) {
     // ตรวจจับข้อผิดพลาด เช่น email หรือ username ซ้ำ
     if (error.code === 11000) {
-      return res.status(409).json({ message: 'Duplicate username or email' });
+      // return res.status(409).json({ message: 'Duplicate username or email' });
     }
     res.status(500).json({ message: 'Failed to create user', error: error.message });
   }
