@@ -67,6 +67,40 @@ exports.checkEmail = async (req, res) => {
 };
 
 
+// // สร้างผู้ใช้ใหม่
+// exports.createUser = async (req, res) => {
+//   try {
+//     const { name, username, email, password, address, role } = req.body;
+
+//     // ตรวจสอบว่าข้อมูลครบถ้วนหรือไม่
+//     if (!name || !username || !email || !password || !address) {
+//       return res.status(400).json({ message: 'Missing required fields' });
+//     }
+
+//     // สร้างผู้ใช้ใหม่
+//     const user = new User({
+//       name,
+//       username,
+//       email,
+//       password,
+//       address,
+//       role
+//     });
+
+//     // บันทึกผู้ใช้ลงในฐานข้อมูล
+//     await user.save();
+
+//     // ตอบกลับเมื่อสำเร็จ
+//     res.status(201).json({ message: 'User created successfully', user });
+//   } catch (error) {
+//     // ตรวจจับข้อผิดพลาด เช่น email หรือ username ซ้ำ
+//     if (error.code === 11000) {
+//       // return res.status(409).json({ message: 'Duplicate username or email' });
+//     }
+//     res.status(500).json({ message: 'Failed to create user', error: error.message });
+//   }
+// };
+
 // สร้างผู้ใช้ใหม่
 exports.createUser = async (req, res) => {
   try {
@@ -75,6 +109,17 @@ exports.createUser = async (req, res) => {
     // ตรวจสอบว่าข้อมูลครบถ้วนหรือไม่
     if (!name || !username || !email || !password || !address) {
       return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    // ตรวจสอบว่า username หรือ email ซ้ำ
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      if (existingUser.username === username) {
+        return res.status(409).json({ message: 'ชื่อผู้ใช้งานนี้มีอยู่แล้ว' });
+      }
+      if (existingUser.email === email) {
+        return res.status(409).json({ message: 'อีเมล์นี้มีการใช้งานแล้ว' });
+      }
     }
 
     // สร้างผู้ใช้ใหม่
@@ -93,13 +138,10 @@ exports.createUser = async (req, res) => {
     // ตอบกลับเมื่อสำเร็จ
     res.status(201).json({ message: 'User created successfully', user });
   } catch (error) {
-    // ตรวจจับข้อผิดพลาด เช่น email หรือ username ซ้ำ
-    if (error.code === 11000) {
-      // return res.status(409).json({ message: 'Duplicate username or email' });
-    }
     res.status(500).json({ message: 'Failed to create user', error: error.message });
   }
 };
+
 
 // ดึงข้อมูลผู้ใช้ทั้งหมด
 exports.getAllUsers = async (req, res) => {
