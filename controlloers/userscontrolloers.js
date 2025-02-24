@@ -43,6 +43,28 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+// API สำหรับตรวจสอบอีเมล์
+exports.checkEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // ตรวจสอบว่ามีการส่งอีเมล์มาหรือไม่
+    if (!email) {
+      return res.status(400).json({ message: 'กรุณากรอกอีเมล์' });
+    }
+
+    // ตรวจสอบว่าอีเมล์มีในระบบหรือไม่
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(409).json({ message: 'อีเมล์นี้มีการใช้งานแล้ว' });
+    }
+
+    // ตอบกลับเมื่ออีเมล์ยังไม่ถูกใช้งาน
+    res.status(200).json({ message: 'อีเมล์สามารถใช้งานได้' });
+  } catch (error) {
+    res.status(500).json({ message: 'ไม่สามารถตรวจสอบอีเมล์ได้', error: error.message });
+  }
+};
 
 
 // สร้างผู้ใช้ใหม่

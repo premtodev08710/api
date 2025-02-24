@@ -7,5 +7,8 @@ router.get('/:id', usersController.getUserById); // ดึงข้อมูล�
 router.put('/update/:id', usersController.updateUser); // อัปเดตข้อมูลผู้ใช้
 router.delete('/delete/:id', usersController.deleteUser); // ลบผู้ใช้
 router.post('/login', usersController.loginUser); // ล็อกอินผู้ใช้
+// router.get('/check-email', checkEmail);
+// router.get('/check-email', usersController.checkEmail);
+router.post('/check-email', usersController.checkEmail); // ใช้ POST แทน GET
 
 module.exports = router;
