@@ -11,13 +11,19 @@ const addressSchema = new mongoose.Schema({
 
 // Schema สำหรับ User
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true, maxlength: 100 },
+  name: { type: String, maxlength: 100, default: '' }, // ไม่จำเป็นต้องใส่ค่า
   username: { type: String, required: true, unique: true, maxlength: 50 },
   email: { type: String, required: true, unique: true, match: [/.+\@.+\..+/, 'Invalid email format'] },
   password: { type: String, required: true, minlength: 6 },
-  address: addressSchema,
+  address: {
+    street: { type: String, default: '' },
+    suite: { type: String, default: '' },
+    city: { type: String, default: '' },
+    zipcode: { type: String, default: '' }
+  }, // ไม่จำเป็นต้องมี address ก็ได้
   role: { type: String, enum: ['admin', 'member'], default: 'member' }
 });
+
 
 // Hook: เข้ารหัสรหัสผ่านก่อนบันทึก
 userSchema.pre('save', async function (next) {
@@ -31,5 +37,7 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password); // เปรียบเทียบรหัสผ่าน
 };
+
+
 
 module.exports = mongoose.model('User', userSchema);
